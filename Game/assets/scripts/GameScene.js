@@ -16,7 +16,22 @@ class GameScene extends Phaser.Scene {
     create() {
         this.createBackGround();
         this.createCards();
+        this.start();
+    }
+
+    start() {
         this.openedCard = null;
+        this.openedCardCount = 0;
+        this.initCards();
+    }
+
+    initCards() {
+        let positions = this.getCardPosition();
+        this.cards.forEach(card => {
+            let position = positions.pop();
+            card.close();
+            card.setPosition(position.x, position.y);
+        })
     }
 
     createBackGround() {
@@ -25,12 +40,9 @@ class GameScene extends Phaser.Scene {
 
     createCards() {
         this.cards = [];
-        let positions = this.getCardPosition();
-        Phaser.Utils.Array.Shuffle(positions);
-
         for (let value of config.cards) {
             for (let i = 0; i < 2; i++) {
-                this.cards.push(new Card(this, value, positions.pop()));
+                this.cards.push(new Card(this, value));
             }
         }
 
@@ -44,6 +56,7 @@ class GameScene extends Phaser.Scene {
         if (this.openedCard) {
             if (this.openedCard.value === card.value) {
                 this.openedCard = null;
+                ++this.openedCardCount;
             } else {
                 this.openedCard.close();
                 this.openedCard = card;
@@ -53,6 +66,9 @@ class GameScene extends Phaser.Scene {
 
         }
         card.open();
+        if (this.openedCardCount === this.cards.length / 2) {
+            this.start();
+        }
     }
 
     getCardPosition() {
@@ -61,8 +77,8 @@ class GameScene extends Phaser.Scene {
         let cardTexture = this.textures.get('card').getSourceImage();
         let cardWidth = cardTexture.width + cardMargin;
         let cardHeight = cardTexture.height + cardMargin;
-        let offsetX = (this.sys.game.config.width - cardWidth * config.cols) / 2;
-        let offsetY = (this.sys.game.config.height - cardHeight * config.rows) / 2;
+        let offsetX = (this.sys.game.config.width - cardWidth * config.cols) / 2 + cardWidth / 2;
+        let offsetY = (this.sys.game.config.height - cardHeight * config.rows) / 2 + cardHeight / 2;
 
         for (let row = 0; row < config.rows; row++) {
             for (let col = 0; col < config.cols; col++) {
@@ -72,6 +88,6 @@ class GameScene extends Phaser.Scene {
                 });
             }
         }
-        return positions;
+        return Phaser.Utils.Array.Shuffle(positions);
     }
 }
