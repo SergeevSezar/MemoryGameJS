@@ -16,6 +16,7 @@ class GameScene extends Phaser.Scene {
     create() {
         this.createBackGround();
         this.createCards();
+        this.openedCard = null;
     }
 
     createBackGround() {
@@ -32,6 +33,26 @@ class GameScene extends Phaser.Scene {
                 this.cards.push(new Card(this, value, positions.pop()));
             }
         }
+
+        this.input.on("gameobjectdown", this.onCardClicked, this);
+    }
+
+    onCardClicked(pointer, card) {
+        if (card.opened) {
+            return false;
+        }
+        if (this.openedCard) {
+            if (this.openedCard.value === card.value) {
+                this.openedCard = null;
+            } else {
+                this.openedCard.close();
+                this.openedCard = card;
+            }
+        } else {
+            this.openedCard = card;
+
+        }
+        card.open();
     }
 
     getCardPosition() {
