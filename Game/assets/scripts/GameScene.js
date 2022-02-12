@@ -11,10 +11,28 @@ class GameScene extends Phaser.Scene {
         this.load.image('card3', 'assets/sprites/card3.png');
         this.load.image('card4', 'assets/sprites/card4.png');
         this.load.image('card5', 'assets/sprites/card5.png');
+
+        this.load.audio('theme', 'assets/sounds/theme.mp3');
+        this.load.audio('card', 'assets/sounds/card.mp3');
+        this.load.audio('complete', 'assets/sounds/complete.mp3');
+        this.load.audio('success', 'assets/sounds/success.mp3');
+        this.load.audio('timeout', 'assets/sounds/timeout.mp3');
+    }
+
+    createSounds() {
+        this.sounds = {
+            card: this.sound.add('card'),
+            theme: this.sound.add('theme'),
+            complete: this.sound.add('complete'),
+            success: this.sound.add('success'),
+            timeout: this.sound.add('timeout'),
+        };
+        this.sounds.theme.play({ volume: 0.1 });
     }
 
     create() {
         this.timeout = config.timeout;
+        this.createSounds();
         this.createTimer();
         this.createBackGround();
         this.createText();
@@ -41,6 +59,7 @@ class GameScene extends Phaser.Scene {
     onTimerTick() {
         this.timeOutText.setText('Time: ' + this.timeout);
         if (this.timeout <= 0) {
+            this.sounds.timeout.play({ volume: 1 });
             this.start();
         } else {
             --this.timeout;
@@ -83,8 +102,10 @@ class GameScene extends Phaser.Scene {
         if (card.opened) {
             return false;
         }
+        this.sounds.card.play({ volume: 1 });
         if (this.openedCard) {
             if (this.openedCard.value === card.value) {
+                this.sounds.success.play();
                 this.openedCard = null;
                 ++this.openedCardCount;
             } else {
@@ -97,6 +118,7 @@ class GameScene extends Phaser.Scene {
         }
         card.open();
         if (this.openedCardCount === this.cards.length / 2) {
+            this.sounds.complete.play({ volume: 1 });
             this.start();
         }
     }
