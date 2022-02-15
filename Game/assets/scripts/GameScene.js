@@ -27,7 +27,6 @@ class GameScene extends Phaser.Scene {
             success: this.sound.add('success'),
             timeout: this.sound.add('timeout'),
         };
-        this.sounds.theme.play({ volume: 0.1 });
     }
 
     create() {
@@ -98,13 +97,13 @@ class GameScene extends Phaser.Scene {
     }
 
     createCards() {
+        this.sounds.theme.play({ volume: 0.1 });
         this.cards = [];
         for (let value of config.cards) {
             for (let i = 0; i < 2; i++) {
                 this.cards.push(new Card(this, value));
             }
         }
-
         this.input.on("gameobjectdown", this.onCardClicked, this);
     }
 
@@ -145,8 +144,9 @@ class GameScene extends Phaser.Scene {
 
         for (let row = 0; row < config.rows; row++) {
             for (let col = 0; col < config.cols; col++) {
+                ++delayCount;
                 positions.push({
-                    delay: ++delayCount * 100,
+                    delay: delayCount * 100,
                     x: offsetX + col * cardWidth,
                     y: offsetY + row * cardHeight,
                 });
